@@ -61,6 +61,20 @@ var population = {
         population.room.memory.containers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_CONTAINER);
         //population.room.memory.emptyStorages = population.room.find(FIND_STRUCTURES, {filter: (s) => {return (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN) && s.energy < s.energyCapacity}});
 
+        var extEnergy = 0;
+        var totalEnergy;
+        if (population.room.memory.extensions.length) {
+            for (var i = 0; i < population.room.memory.extensions.length; i++) {
+                extEnergy += population.room.memory.extensions[i].energy;
+            }
+            extEnergy += population.spawner.energy;
+            totalEnergy = (population.room.memory.extensions.length * 50) + population.spawner.energyCapacity;
+            console.log(population.room.name + ' spawning energy: ' + extEnergy + '/' + totalEnergy);
+        }
+        else {
+            totalEnergy = population.spawner.energyCapacity;
+        }
+
         var buildTarget = population.room.find(FIND_MY_CONSTRUCTION_SITES);
 
         for (var i in Memory.creeps) {
@@ -100,21 +114,6 @@ var population = {
     },
 
     spawn: function (role) {
-
-        var extEnergy = 0;
-        var totalEnergy;
-        if (population.room.memory.extensions.length) {
-            for (var i = 0; i < population.room.memory.extensions.length; i++) {
-                extEnergy += population.room.memory.extensions[i].energy;
-            }
-            extEnergy += population.spawner.energy;
-            totalEnergy = (population.room.memory.extensions.length * 50) + population.spawner.energyCapacity;
-            console.log(population.room.name + ' spawning energy: ' + extEnergy + '/' + totalEnergy);
-        }
-        else {
-            totalEnergy = population.spawner.energyCapacity;
-        }
-
         if (!population.spawner.spawning && population.harvesters.length < 3 && (population.assembleBody(extEnergy, 'harvester') != ERR_NOT_ENOUGH_ENERGY)) {
             console.log("+ " + population.name + ", " + role + " (" + (population.creeps.length + 1) + ")");
         }

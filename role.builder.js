@@ -3,12 +3,14 @@ var roleRepairer = require('role.repairer');
 var roleBuilder = {
 
     assign: function (creep) {
-        var buildTarget = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
+        var container;
+        var buildTarget = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
 
-        if (!buildTarget.length) {
+        if (!buildTarget) {
             roleRepairer.assign(creep);
         }
-        else {
+
+        if (buildTarget) {
             if (creep.memory.building && creep.carry.energy == 0) {
                 creep.memory.building = false;
             }
@@ -17,15 +19,24 @@ var roleBuilder = {
             }
 
             if (!creep.memory.building) {
-                var sources = creep.room.find(FIND_SOURCES);
-
-                if (creep.harvest(sources[1]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[1], {visualizePathStyle: {stroke: '#ffaa00'}});
+                if (creep.room.memory.storages.length) {
+                    container = creep.room.memory.storages[0];
+                }
+                else {
+                    container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                        filter: (s) => {
+                            return ((s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_CONTAINER) && s.energy == s.energyCapacity)
+                        }
+                    });
+                }
+                
+                if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(container, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             }
             else {
-                if (creep.build(buildTarget[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(buildTarget[0], {visualizePathStyle: {stroke: '#ffffff'}});
+                if (creep.build(buildTarget) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(buildTarget, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             }
         }

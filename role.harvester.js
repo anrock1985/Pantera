@@ -2,11 +2,7 @@ var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 
 var roleHarvester = {
-
-    useHarvestSpot: function (creep) {
-
-    },
-
+    
     assign: function (creep) {
         var buildTarget = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
         var sources = creep.room.find(FIND_SOURCES);
@@ -51,16 +47,15 @@ var roleHarvester = {
         }
 
         if (!creep.memory.harvesting && creep.carry.energy != 0) {
-//        else {
-            var targets = creep.room.find(FIND_STRUCTURES, {
+            var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
+                    return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) && structure.energy < structure.energyCapacity;
                 }
             });
 
-            if (!targets.length) {
+            if (!targets) {
                 if (creep.room.energyAvailable != creep.room.energyCapacityAvailable) {
-                    targets = creep.room.find(FIND_STRUCTURES, {
+                    targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                         filter: (structure) => {
                             return (structure.structureType == STRUCTURE_TOWER) &&
                                 structure.energy <= structure.energyCapacity / 2;
@@ -69,9 +64,30 @@ var roleHarvester = {
                 }
             }
 
-            if (targets.length > 0) {
-                if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
+            /*
+             TODO: Сделать персональные цели для каждого крипа (например, через память комнаты. Добавлять в массив только действующие цели. Придётся каждый раз формировать массив целей, а потом сравнивать его с массивом в памяти и отсеивать совпадения)
+             */
+
+            /*
+             var i = 0;
+             var j = 0;
+             var matchXY = true;
+             for (i; i < creep.room.memory.tStorage.length; i++) {
+             for (j; j <= i; j++) {
+             if (creep.room.memory.tStorage[i][0] == creep.pos.x && ccreep.room.memory.tStorage[j][1] == creep.pos.y) {
+             matchXY = false;
+             }
+             }
+             }
+             if (matchXY) {
+             creep.room.memory.tStorage.push([creep.pos.x, creep.pos.y]);
+             }
+             */
+
+            if (targets) {
+                creep.memory.target = targets;
+                if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             }
 

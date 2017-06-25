@@ -24,7 +24,6 @@
  TOUGH	        10	    No effect, just additional hit points to the creep's body. Can be boosted to resist damage.
  */
 
-//var _ = require('lodash');
 var roleHarvester = require('role.harvester');
 var roleMiner = require('role.miner');
 var roleCarrier = require('role.carrier');
@@ -43,6 +42,7 @@ var population = {
     room: {},
     creeps: [],
     spawner: {},
+    towers: [],
     name: {},
 
     checkPop: function (spawn) {
@@ -55,6 +55,11 @@ var population = {
         population.upgraders = _.filter(Game.creeps, (c) => c.memory.role == 'upgrader');
         population.builders = _.filter(Game.creeps, (c) => c.memory.role == 'builder');
         population.repairers = _.filter(Game.creeps, (c) => c.memory.role == 'repairer');
+        population.towers = _.filter(Game.structures, (t) => t.structureType == STRUCTURE_TOWER);
+        population.room.memory.storages = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_STORAGE);
+        population.room.memory.extensions = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_EXTENSION);
+        population.room.memory.containers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_CONTAINER);
+        //population.room.memory.emptyStorages = population.room.find(FIND_STRUCTURES, {filter: (s) => {return (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN) && s.energy < s.energyCapacity}});
 
         var buildTarget = population.room.find(FIND_MY_CONSTRUCTION_SITES);
 
@@ -85,7 +90,7 @@ var population = {
             population.spawn('builder');
             population.assignRole();
         }
-        else if (population.repairers.length < 1) {
+        else if (population.repairers.length < 2) {
             population.spawn('repairer');
             population.assignRole();
         }
@@ -95,8 +100,26 @@ var population = {
     },
 
     spawn: function (role) {
-            if (!population.spawner.spawning && (population.assembleBody(population.room.energyCapacityAvailable, role) != ERR_NOT_ENOUGH_ENERGY)) {
-                console.log("+ " + population.name + ", " + role + " (" +(population.creeps.length+1)+")");
+
+        var extEnergy = 0;
+        var totalEnergy;
+        if (population.room.memory.extensions.length) {
+            for (var i = 0; i < population.room.memory.extensions.length; i++) {
+                extEnergy += population.room.memory.extensions[i].energy;
+            }
+            extEnergy += population.spawner.energy;
+            totalEnergy = (population.room.memory.extensions.length * 50) + population.spawner.energyCapacity;
+            console.log(population.room.name + ' spawning energy: ' + extEnergy + '/' + totalEnergy);
+        }
+        else {
+            totalEnergy = population.spawner.energyCapacity;
+        }
+
+        if (!population.spawner.spawning && population.harvesters.length < 3 && (population.assembleBody(extEnergy, 'harvester') != ERR_NOT_ENOUGH_ENERGY)) {
+            console.log("+ " + population.name + ", " + role + " (" + (population.creeps.length + 1) + ")");
+        }
+        else if (!population.spawner.spawning && (population.assembleBody(totalEnergy, role) != ERR_NOT_ENOUGH_ENERGY)) {
+            console.log("+ " + population.name + ", " + role + " (" + (population.creeps.length + 1) + ")");
         }
     },
 

@@ -7,17 +7,28 @@ module.exports.loop = function () {
     }
 
     var tower = Game.getObjectById('594a6d94e5eb61210d615ca6');
-    if(tower) {
-        var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (structure) => structure.hits < structure.hitsMax /*&& structure.structureType != STRUCTURE_WALL*/
-        });
-        if(closestDamagedStructure) {
-            tower.repair(closestDamagedStructure);
-        }
-
+    if (tower) {
         var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if(closestHostile) {
+        if (closestHostile) {
+            console.log('>>>>>> HOSTILE: ' + closestHostile.pos.x + ',' + closestHostile.pos.y);
+        }
+        if (closestHostile) {
             tower.attack(closestHostile);
+        }
+        if (!closestHostile) {
+            var closestInjuredCreep = tower.pos.findClosestByRange(FIND_MY_CREEPS, {filter: (c) => {return (c.hits < c.hitsMax)}});
+
+            if (closestInjuredCreep) {
+                console.log('Healing creep: ' + closestInjuredCreep.name);
+                tower.heal(closestInjuredCreep);
+            }
+
+            var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+                filter: (structure) => structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL
+            });
+            if (closestDamagedStructure) {
+                tower.repair(closestDamagedStructure);
+            }
         }
     }
 

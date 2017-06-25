@@ -16,7 +16,11 @@ module.exports.loop = function () {
             tower.attack(closestHostile);
         }
         if (!closestHostile) {
-            var closestInjuredCreep = tower.pos.findClosestByRange(FIND_MY_CREEPS, {filter: (c) => {return (c.hits < c.hitsMax)}});
+            var closestInjuredCreep = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
+                filter: (c) => {
+                    return (c.hits < c.hitsMax)
+                }
+            });
 
             if (closestInjuredCreep) {
                 console.log('Healing creep: ' + closestInjuredCreep.name);
@@ -32,12 +36,6 @@ module.exports.loop = function () {
         }
     }
 
-    console.log('Tower is Active: ' + tower.pos.x + ',' + tower.pos.y);
-    console.log('Harvesters: ' + population.harvesters.length);
-    console.log('Miners: ' + population.miners.length);
-    console.log('Carriers: ' + population.carriers.length);
-    console.log('Upgraders: ' + population.upgraders.length);
-    console.log('Builders: ' + population.builders.length);
-    console.log('Repairers: ' + population.repairers.length);
+    console.log('H:' + population.room.memory.harvesters.length + ' M:' + population.room.memory.miners.length + ' C:' + population.room.memory.carriers.length + ' U:' + population.room.memory.upgraders.length + ' B:' + population.room.memory.builders.length + ' R:' + population.room.memory.repairers.length);
     console.log('----------------');
 };

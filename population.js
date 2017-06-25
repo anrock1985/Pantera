@@ -33,46 +33,51 @@ var roleRepairer = require('role.repairer');
 
 var population = {
     body: [],
-    harvesters: [],
-    miners: [],
-    carriers: [],
-    upgraders: [],
-    builders: [],
-    repairers: [],
     room: {},
     creeps: [],
     spawner: {},
-    towers: [],
     name: {},
+    extEnergy: 0,
+    totalEnergy: 0,
 
     checkPop: function (spawn) {
         population.spawner = spawn;
         population.room = spawn.room;
         population.creeps = population.room.find(FIND_MY_CREEPS);
-        population.harvesters = _.filter(Game.creeps, (c) => c.memory.role == 'harvester');
-        population.miners = _.filter(Game.creeps, (c) => c.memory.role == 'miner');
-        population.carriers = _.filter(Game.creeps, (c) => c.memory.role == 'carrier');
-        population.upgraders = _.filter(Game.creeps, (c) => c.memory.role == 'upgrader');
-        population.builders = _.filter(Game.creeps, (c) => c.memory.role == 'builder');
-        population.repairers = _.filter(Game.creeps, (c) => c.memory.role == 'repairer');
-        population.towers = _.filter(Game.structures, (t) => t.structureType == STRUCTURE_TOWER);
+        population.room.memory.harvesters = _.filter(Game.creeps, (c) => c.memory.role == 'harvester');
+        population.room.memory.miners = _.filter(Game.creeps, (c) => c.memory.role == 'miner');
+        population.room.memory.carriers = _.filter(Game.creeps, (c) => c.memory.role == 'carrier');
+        population.room.memory.upgraders = _.filter(Game.creeps, (c) => c.memory.role == 'upgrader');
+        population.room.memory.builders = _.filter(Game.creeps, (c) => c.memory.role == 'builder');
+        population.room.memory.repairers = _.filter(Game.creeps, (c) => c.memory.role == 'repairer');
+
+        population.room.memory.towers = _.filter(Game.structures, (t) => t.structureType == STRUCTURE_TOWER);
+        population.room.memory.towersNeedRefuel = false;
+        if (population.room.memory.towers.length) {
+            for (var i = 0; i < population.room.memory.towers.length; i++) {
+                if (population.room.memory.towers[i].energy < (population.room.memory.towers[i].energyCapacity / 2)) {
+                    population.room.memory.towersNeedRefuel = true;
+                }
+            }
+        }
+
         population.room.memory.storages = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_STORAGE);
         population.room.memory.extensions = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_EXTENSION);
         population.room.memory.containers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_CONTAINER);
         //population.room.memory.emptyStorages = population.room.find(FIND_STRUCTURES, {filter: (s) => {return (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN) && s.energy < s.energyCapacity}});
 
-        var extEnergy = 0;
-        var totalEnergy;
+        population.extEnergy = 0;
+        population.totalEnergy = 0;
         if (population.room.memory.extensions.length) {
             for (var i = 0; i < population.room.memory.extensions.length; i++) {
-                extEnergy += population.room.memory.extensions[i].energy;
+                population.extEnergy += population.room.memory.extensions[i].energy;
             }
-            extEnergy += population.spawner.energy;
-            totalEnergy = (population.room.memory.extensions.length * 50) + population.spawner.energyCapacity;
-            console.log(population.room.name + ' spawning energy: ' + extEnergy + '/' + totalEnergy);
+            population.extEnergy += population.spawner.energy;
+            population.totalEnergy = (population.room.memory.extensions.length * 50) + population.spawner.energyCapacity;
+            console.log('Energy: ' + population.extEnergy + '/' + population.totalEnergy + ' [' + population.room.energyCapacityAvailable + ']');
         }
         else {
-            totalEnergy = population.spawner.energyCapacity;
+            population.totalEnergy = population.spawner.energyCapacity;
         }
 
         var buildTarget = population.room.find(FIND_MY_CONSTRUCTION_SITES);
@@ -84,27 +89,27 @@ var population = {
             }
         }
 
-        if (population.harvesters.length < 3) {
+        if (population.room.memory.harvesters.length < 3) {
             population.spawn('harvester');
             population.assignRole();
         }
-        else if (population.miners.length < 1) {
+        else if (population.room.memory.miners.length < 1) {
             population.spawn('miner');
             population.assignRole();
         }
-        else if (population.carriers.length < 2) {
+        else if (population.room.memory.carriers.length < 2) {
             population.spawn('carrier');
             population.assignRole();
         }
-        else if (population.upgraders.length < 1) {
+        else if (population.room.memory.upgraders.length < 1) {
             population.spawn('upgrader');
             population.assignRole();
         }
-        else if (population.builders.length < 1 && buildTarget.length) {
+        else if (population.room.memory.builders.length < 1 && buildTarget.length) {
             population.spawn('builder');
             population.assignRole();
         }
-        else if (population.repairers.length < 2) {
+        else if (population.room.memory.repairers.length < 2) {
             population.spawn('repairer');
             population.assignRole();
         }
@@ -114,10 +119,10 @@ var population = {
     },
 
     spawn: function (role) {
-        if (!population.spawner.spawning && population.harvesters.length < 3 && (population.assembleBody(extEnergy, 'harvester') != ERR_NOT_ENOUGH_ENERGY)) {
+        if (!population.spawner.spawning && population.room.memory.harvesters.length < 3 && (population.assembleBody(population.extEnergy, 'harvester') != ERR_NOT_ENOUGH_ENERGY)) {
             console.log("+ " + population.name + ", " + role + " (" + (population.creeps.length + 1) + ")");
         }
-        else if (!population.spawner.spawning && (population.assembleBody(totalEnergy, role) != ERR_NOT_ENOUGH_ENERGY)) {
+        else if (!population.spawner.spawning && (population.assembleBody(population.totalEnergy, role) != ERR_NOT_ENOUGH_ENERGY)) {
             console.log("+ " + population.name + ", " + role + " (" + (population.creeps.length + 1) + ")");
         }
     },

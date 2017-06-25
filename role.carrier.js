@@ -17,14 +17,7 @@ var roleCarrier = {
         }
 
         if (creep.memory.carrying) {
-            var storages = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (s) => {
-                    return ((s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE) && s.energy < s.energyCapacity)
-                }
-            });
-
-            if (!storages) {
-                console.log('No storages');
+            if (creep.room.memory.towersNeedRefuel) {
                 if (creep.room.energyAvailable != creep.room.energyCapacityAvailable) {
                     storages = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                         filter: (structure) => {
@@ -41,6 +34,13 @@ var roleCarrier = {
                         }
                     });
                 }
+            }
+            else {
+                var storages = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                    filter: (s) => {
+                        return ((s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE) && s.energy < s.energyCapacity)
+                    }
+                });
             }
 
             if (storages) {

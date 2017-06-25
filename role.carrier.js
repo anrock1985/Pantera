@@ -44,7 +44,6 @@ var roleCarrier = {
             }
 
             if (storages) {
-                console.log('Current Storage: ' + storages.pos.x + ',' + storages.pos.y);
                 if (creep.transfer(storages, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(storages, {visualizePathStyle: {stroke: '#ffffff'}});
                 }

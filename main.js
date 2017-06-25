@@ -28,7 +28,7 @@ module.exports.loop = function () {
             }
 
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (structure) => structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL
+                filter: (s) => (s.structureType == STRUCTURE_RAMPART && (s.hits < s.hitsMax / 3000)) || (s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART)
             });
             if (closestDamagedStructure) {
                 tower.repair(closestDamagedStructure);

@@ -97,7 +97,7 @@ var population = {
             population.spawn('miner');
             population.assignRole();
         }
-        else if (population.room.memory.carriers.length < 2) {
+        else if (population.room.memory.carriers.length < 2 && population.room.memory.miners.length) {
             population.spawn('carrier');
             population.assignRole();
         }

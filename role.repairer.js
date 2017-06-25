@@ -11,7 +11,7 @@ var roleRepairer = {
 
         var repairWalls = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (s) => {
-                return ((s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART) && s.hits < (s.hitsMax / 1200))
+                return ((s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART) && s.hits < (s.hitsMax / 7200))
             }
         });
 
@@ -42,14 +42,14 @@ var roleRepairer = {
         }
 
         if (creep.memory.repairing && repairTarget) {
-            console.log('Repairing: ' + repairTarget.pos.x + ',' + repairTarget.pos.y)
+            console.log('Repairing: ' + repairTarget.pos.x + ',' + repairTarget.pos.y);
             if (creep.repair(repairTarget) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(repairTarget, {visualizePathStyle: {stroke: '#ffaa00'}});
             }
         }
 
         if (creep.memory.repairing && !repairTarget && repairWalls) {
-            console.log('Repairing Wall: ' + repairWalls.pos.x + ',' + repairWalls.pos.y)
+            console.log('Repairing Wall: ' + repairWalls.pos.x + ',' + repairWalls.pos.y);
             if (creep.repair(repairWalls) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(repairWalls, {visualizePathStyle: {stroke: '#ffaa00'}});
             }

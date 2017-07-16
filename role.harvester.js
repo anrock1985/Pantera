@@ -4,13 +4,14 @@ var roleBuilder = require('role.builder');
 var roleHarvester = {
     
     assign: function (creep) {
+        var targets = null;
         var buildTarget = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
         var sources = creep.room.find(FIND_SOURCES);
 
-        if (buildTarget.length && creep.room.energyAvailable == creep.room.energyCapacityAvailable) {
+        if (buildTarget.length && creep.room.energyAvailable >= creep.room.memory.spawnEnergy) {
             roleBuilder.assign(creep);
         }
-        else if (creep.room.energyAvailable == creep.room.energyCapacityAvailable && !buildTarget.length) {
+        else if (creep.room.energyAvailable >= creep.room.memory.spawnEnergy && !buildTarget.length) {
             roleUpgrader.assign(creep);
         }
         else {
@@ -20,78 +21,87 @@ var roleHarvester = {
             if (creep.carry.energy == creep.carryCapacity && creep.memory.harvesting) {
                 creep.memory.harvesting = false;
             }
-        }
 
-        if (creep.memory.harvesting && creep.room.energyAvailable != creep.room.energyCapacityAvailable) {
-            if (creep.harvest(sources[1]) == OK) {
-                if (creep.room.memory.harvestPoints == undefined) {
-                    creep.room.memory.harvestPoints = [[creep.pos.x, creep.pos.y]];
-                }
-                var i = 0;
-                var j = 0;
-                var matchXY = true;
-                for (i; i < creep.room.memory.harvestPoints.length; i++) {
-                    for (j; j <= i; j++) {
-                        if (creep.room.memory.harvestPoints[i][0] == creep.pos.x && creep.room.memory.harvestPoints[j][1] == creep.pos.y) {
-                            matchXY = false;
+            if (creep.memory.harvesting && creep.room.energyAvailable != creep.room.memory.spawnEnergy) {
+                if (creep.harvest(sources[1]) == OK) {
+                    if (creep.room.memory.harvestPoints == undefined) {
+                        creep.room.memory.harvestPoints = [[creep.pos.x, creep.pos.y]];
+                    }
+                    var i = 0;
+                    var j = 0;
+                    var matchXY = true;
+                    for (i; i < creep.room.memory.harvestPoints.length; i++) {
+                        for (j; j <= i; j++) {
+                            if (creep.room.memory.harvestPoints[i][0] == creep.pos.x && creep.room.memory.harvestPoints[j][1] == creep.pos.y) {
+                                matchXY = false;
+                            }
                         }
                     }
+                    if (matchXY) {
+                        creep.room.memory.harvestPoints.push([creep.pos.x, creep.pos.y]);
+                    }
                 }
-                if (matchXY) {
-                    creep.room.memory.harvestPoints.push([creep.pos.x, creep.pos.y]);
+                else {
+                    creep.moveTo(sources[1]);
                 }
             }
-            else {
-                creep.moveTo(sources[1]);
-            }
-        }
 
-        if (!creep.memory.harvesting && creep.carry.energy != 0) {
-            var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) && structure.energy < structure.energyCapacity;
+            if (!creep.memory.harvesting && creep.carry.energy != 0) {
+                targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                    filter: (structure) => {
+                        return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_CONTAINER) && structure.energy < structure.energyCapacity;
+                    }
+                });
+
+                if (!targets) {
+                    if (creep.room.energyAvailable != creep.room.memory.spawnEnergy) {
+                        targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                            filter: (structure) => {
+                                return (structure.structureType == STRUCTURE_TOWER) &&
+                                    structure.energy <= structure.energyCapacity / 2;
+                            }
+                        });
+                    }
                 }
-            });
 
-            if (!targets) {
-                if (creep.room.energyAvailable != creep.room.energyCapacityAvailable) {
-                    targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (structure) => {
-                            return (structure.structureType == STRUCTURE_TOWER) &&
-                                structure.energy <= structure.energyCapacity / 2;
+                if (creep.room.memory.storages.length && !targets) {
+                    targets = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        filter: (s) => {
+                            return ((s.structureType == STRUCTURE_STORAGE)/* && s.energy < s.energyCapacity*/)
                         }
                     });
                 }
-            }
 
-            /*
-             TODO: Сделать персональные цели для каждого крипа (например, через память комнаты. Добавлять в массив только действующие цели. Придётся каждый раз формировать массив целей, а потом сравнивать его с массивом в памяти и отсеивать совпадения)
-             */
+                /*
+                 TODO: Сделать персональные цели для каждого крипа (например, через память комнаты. Добавлять в массив только действующие цели. Придётся каждый раз формировать массив целей, а потом сравнивать его с массивом в памяти и отсеивать совпадения)
+                 */
 
-            /*
-             var i = 0;
-             var j = 0;
-             var matchXY = true;
-             for (i; i < creep.room.memory.tStorage.length; i++) {
-             for (j; j <= i; j++) {
-             if (creep.room.memory.tStorage[i][0] == creep.pos.x && ccreep.room.memory.tStorage[j][1] == creep.pos.y) {
-             matchXY = false;
-             }
-             }
-             }
-             if (matchXY) {
-             creep.room.memory.tStorage.push([creep.pos.x, creep.pos.y]);
-             }
-             */
+                /*
+                 var i = 0;
+                 var j = 0;
+                 var matchXY = true;
+                 for (i; i < creep.room.memory.tStorage.length; i++) {
+                 for (j; j <= i; j++) {
+                 if (creep.room.memory.tStorage[i][0] == creep.pos.x && ccreep.room.memory.tStorage[j][1] == creep.pos.y) {
+                 matchXY = false;
+                 }
+                 }
+                 }
+                 if (matchXY) {
+                 creep.room.memory.tStorage.push([creep.pos.x, creep.pos.y]);
+                 }
+                 */
 
-            if (targets) {
-                creep.memory.target = targets;
-                if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
+                if (targets) {
+                    console.log('Storing: ' + targets.pos.x + ',' + targets.pos.y);
+                    creep.memory.target = targets;
+                    if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
+                    }
                 }
+
+
             }
-
-
         }
     }
 };

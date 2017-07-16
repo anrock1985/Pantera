@@ -1,6 +1,7 @@
 var roleCarrier = {
 
     assign: function (creep) {
+        var storages = null;
         var sources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
 
         if (creep.memory.carrying && creep.carry.energy == 0) {
@@ -36,18 +37,28 @@ var roleCarrier = {
                 }
             }
             else {
-                var storages = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                storages = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: (s) => {
-                        return ((s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE) && s.energy < s.energyCapacity)
+                        return ((s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_CONTAINER) && s.energy < s.energyCapacity)
+                    }
+                });
+            }
+
+            if (creep.room.memory.storages.length && !storages) {
+                storages = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                    filter: (s) => {
+                        return ((s.structureType == STRUCTURE_STORAGE)/* && s.energy < s.energyCapacity*/)
                     }
                 });
             }
 
             if (storages) {
+                console.log('Storing: ' + storages.pos.x + ',' + storages.pos.y);
                 if (creep.transfer(storages, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(storages, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             }
+
         }
     }
 };

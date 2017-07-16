@@ -74,6 +74,7 @@ var population = {
             }
             population.extEnergy += population.spawner.energy;
             population.totalEnergy = (population.room.memory.extensions.length * 50) + population.spawner.energyCapacity;
+            population.room.memory.spawnEnergy = population.totalEnergy;
             console.log('Energy: ' + population.extEnergy + '/' + population.totalEnergy + ' [' + population.room.energyCapacityAvailable + ']');
         }
         else {

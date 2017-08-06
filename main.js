@@ -7,7 +7,6 @@ module.exports.loop = function () {
     }
 
     for (var i in population.room.memory.towers) {
-        //var tower = Game.getObjectById('594a6d94e5eb61210d615ca6');
         var tower = population.room.memory.towers[i];
         if (tower) {
             var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);

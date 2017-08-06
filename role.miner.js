@@ -27,6 +27,7 @@ var roleMiner = {
 
         if (!creep.room.memory.isHarvestChecking) {
             //TODO: Присвоить каждому майнеру персональный HarvestPoint из массива доступных. Удалить присвоенный HarvestPoint из списка доступных. При смерти майнера вернуть используемый им HarvestPoint в список доступных.
+            //TODO: Проверка доступности сгенерированных HarvestPoint, например если они внутри замкнутой области гор.
             if (creep.memory.HarvestPointX == undefined && creep.memory.HarvestPointX == undefined && creep.room.memory.harvestPoints != undefined) {
                 creep.memory.HarvestPointX = creep.room.memory.harvestPoints.splice(0, 1);
                 creep.memory.HarvestPointY = creep.room.memory.harvestPoints.splice(0, 1);

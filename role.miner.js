@@ -33,6 +33,7 @@ var roleMiner = {
                 creep.memory.HarvestPointX = creep.room.memory.harvestPoints.splice(0, 1);
                 creep.memory.HarvestPointY = creep.room.memory.harvestPoints.splice(0, 1);
             }
+            /*
             if (sources.length > 1) {
                 for (let i in sources) {
                     if (sources[i].energy != 0) {
@@ -44,11 +45,12 @@ var roleMiner = {
             if (creep.harvest(target) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
             }
-            /*
+            */
+
             if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(sources[0], {visualizePathStyle: {stroke: '#ffffff'}});
             }
-            */
+
         }
     }
 };

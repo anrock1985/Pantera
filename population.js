@@ -51,6 +51,8 @@ var population = {
         population.room.memory.builders = _.filter(Game.creeps, (c) => c.memory.role == 'builder');
         population.room.memory.repairers = _.filter(Game.creeps, (c) => c.memory.role == 'repairer');
 
+        population.room.memory.hasHarvestPoint = _.filter(Game.creeps, (c) => c.memory.HarvestPointX != undefined);
+
         population.room.memory.towers = _.filter(Game.structures, (t) => t.structureType == STRUCTURE_TOWER);
         population.room.memory.towersNeedRefuel = false;
         if (population.room.memory.towers.length) {

@@ -2,7 +2,11 @@ var roleCarrier = {
 
     assign: function (creep) {
         var storages = null;
-        var sources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
+        var sources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+            filter: (r) => {
+                return (r.energy >= creep.carryCapacity / 4);
+            }
+        });
 
         if (creep.memory.carrying == undefined) {
             creep.memory.carrying = false;

@@ -13,7 +13,7 @@ var roleCarrier = {
         if (creep.memory.carrying && creep.carry.energy == 0) {
             creep.memory.carrying = false;
         }
-        if (!creep.memory.carrying && (creep.carry.energy >= (creep.carry.energyCapacity / 2))) {
+        if (!creep.memory.carrying && (creep.carry.energy >= (creep.carryCapacity / 2))) {
             creep.memory.carrying = true;
         }
 

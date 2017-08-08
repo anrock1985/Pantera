@@ -7,13 +7,13 @@ var roleCarrier = {
         if (creep.memory.carrying && creep.carry.energy == 0) {
             creep.memory.carrying = false;
         }
-        if (!creep.memory.carrying && creep.carry.energy > 0) {
+        if (!creep.memory.carrying && (creep.carry.energy >= (creep.carry.energyCapacity / 2))) {
             creep.memory.carrying = true;
         }
 
         if (sources && !creep.memory.carrying) {
             if (creep.pickup(sources) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources, {visualizePathStyle: {stroke: '#ffaa00'}});
+                creep.moveTo(sources, {visualizePathStyle: {stroke: '#000000'}});
             }
         }
 
@@ -55,7 +55,7 @@ var roleCarrier = {
             if (storages) {
                 console.log('Storing: ' + storages.pos.x + ',' + storages.pos.y);
                 if (creep.transfer(storages, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(storages, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(storages, {visualizePathStyle: {stroke: '#000000'}});
                 }
             }
 

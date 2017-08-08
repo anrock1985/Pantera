@@ -4,6 +4,10 @@ var roleCarrier = {
         var storages = null;
         var sources = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
 
+        if (creep.memory.carrying == undefined) {
+            creep.memory.carrying == false;
+        }
+
         if (creep.memory.carrying && creep.carry.energy == 0) {
             creep.memory.carrying = false;
         }

@@ -2,6 +2,9 @@ var roleUpgrader = {
 
     assign: function (creep) {
         var container;
+        if (creep.memory.upgrading == undefined) {
+            creep.memory.upgrading = false;
+        }
         if (creep.memory.upgrading && creep.carry.energy == 0) {
             creep.memory.upgrading = false;
         }

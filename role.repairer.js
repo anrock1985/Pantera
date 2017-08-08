@@ -15,6 +15,9 @@ var roleRepairer = {
             }
         });
 
+        if (creep.memory.repairing == undefined) {
+            creep.memory.repairing = false;
+        }
         if (creep.memory.repairing && creep.carry.energy == 0) {
             creep.memory.repairing = false;
         }

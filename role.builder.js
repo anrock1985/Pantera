@@ -11,6 +11,9 @@ var roleBuilder = {
         }
 
         if (buildTarget) {
+            if (creep.memory.building == undefined) {
+                creep.memory.building = false;
+            }
             if (creep.memory.building && creep.carry.energy == 0) {
                 creep.memory.building = false;
             }

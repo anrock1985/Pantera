@@ -15,6 +15,9 @@ var roleHarvester = {
             roleUpgrader.assign(creep);
         }
         else {
+            if (creep.memory.harvesting == undefined) {
+                creep.memory.harvesting = true;
+            }
             if (creep.carry.energy == 0 && !creep.memory.harvesting) {
                 creep.memory.harvesting = true;
             }

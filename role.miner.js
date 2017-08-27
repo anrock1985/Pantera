@@ -9,10 +9,10 @@ var roleMiner = {
         }
 
         if (creep.room.memory.isHarvestChecking) {
-            for (let i = 0; i < sources.length; i++) {
+            for (var i = 0; i < sources.length; i++) {
                 var temp = creep.room.lookForAtArea(LOOK_TERRAIN, +sources[i].pos.y - 1, +sources[i].pos.x - 1, +sources[i].pos.y + 1, +sources[i].pos.x + 1, true);
                 //temp[i] {type: terrain, terrain: plain\wall\swamp, x: 10, y: 20}
-                for (let j in temp) {
+                for (var j in temp) {
                     if (temp[j].terrain != 'wall') {
                         if (!creep.room.memory.harvestPoints) {
                             creep.room.memory.harvestPoints = [];
